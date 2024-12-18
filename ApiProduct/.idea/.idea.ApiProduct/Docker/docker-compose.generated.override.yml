@@ -1,0 +1,20 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  apiproduct:
+    build:
+      context: "C:\\Users\\j_may\\Documentos\\Observabilidade_E2E\\Api\\ApiProduct"
+      dockerfile: "ApiProduct/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/ApiProduct.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "apiproduct:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\j_may\\Documentos\\Observabilidade_E2E\\Api\\ApiProduct\\ApiProduct:/app:rw"
+    - "C:\\Users\\j_may\\Documentos\\Observabilidade_E2E\\Api\\ApiProduct:/src:rw"
+    - "C:\\Users\\j_may\\.nuget\\packages:/root/.nuget/packages"
+    working_dir: "/app"

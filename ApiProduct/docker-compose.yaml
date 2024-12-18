@@ -1,0 +1,70 @@
+﻿version: '3.8'
+services:
+  apiproduct:
+    image: apiproduct
+    build:
+      context: .
+      dockerfile: ApiProduct/Dockerfile
+    container_name: apiproduct
+    env_file:
+      - ./otel-dotnet.env
+    environment:
+      OTEL_SERVICE_NAME: "apiproduct"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otelcollector:4318"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=ayla;User Id=sa;Password=123testPass@;TrustServerCertificate=True;"
+    ports:
+      - 8080:8080
+      - 8081:8081
+
+  
+  otelcollector:
+    image: otel/opentelemetry-collector-contrib
+    container_name: otelcollector
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    ports:
+      - "4318:4318"
+      - "4317:4317"
+
+  
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      MSSQL_SA_PASSWORD: "123testPass@"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    container_name: sqlserver
+    hostname: sqlserver
+
+  aspire:
+    image: mcr.microsoft.com/dotnet/nightly/aspire-dashboard:8.0.0-preview.6
+    container_name: aspire
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: 'true'
+    ports:
+      - "18888:18888"
+      - "18889:18889"
+    restart: always
+
+  
+  mssqltools:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      - sqlserver
+    volumes:
+      - ./data/schema.sql:/tmp/schema.sql
+    command: /bin/bash -c "sleep 10 && /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 123testPass@ -d master -i /tmp/schema.sql"
+
+    
+  jaeger:
+    image: jaegertracing/all-in-one:1.50.0
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "16685:16685"
+      - "14268:14268"
+      - "14250:14250"
+      - "14317:4317"
+      - "9411:9411"

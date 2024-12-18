@@ -1,0 +1,55 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 2000
+  batch:
+  filter:
+    metrics:
+      metric:
+        - 'IsMatch(name, "http.client.*")'
+        - 'IsMatch(name, "http.server.*")'
+        - 'IsMatch(name, "process.runtime.dotnet.*")'
+        - 'IsMatch(name, "aspnetcore.routing.*")'
+        - 'IsMatch(name, "kestrel.*")'
+      datapoint:
+        - metric.name == "dns.lookup.duration"
+        - metric.name == "aspnetcore.routing.match_attempts"
+        
+exporters:
+  debug:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 200
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+  otlp/aspire:
+    endpoint: aspire:18889
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, otlp/jaeger]
+    metrics:
+      receivers: [otlp]
+      processors: [batch,filter]
+      exporters: [debug, otlp/aspire]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
