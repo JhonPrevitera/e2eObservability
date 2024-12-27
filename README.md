@@ -22,7 +22,7 @@ Acesse a pasta webapplication:
   
     cd webapplication
 
-Inicie o ambiente de desenvolvimento:
+Inicie o frontend no modo de desenvolvimento:
 
   Copiar código:
   
