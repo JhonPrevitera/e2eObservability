@@ -22,6 +22,12 @@ Acesse a pasta webapplication:
   
     cd webapplication
 
+Instale as dependencias:
+
+   Copiar código:
+
+     npm install
+
 Inicie o frontend no modo de desenvolvimento:
 
   Copiar código:
