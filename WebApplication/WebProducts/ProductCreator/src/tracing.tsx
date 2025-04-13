@@ -8,7 +8,7 @@ import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import React, { useEffect } from 'react';
 
-const serviceName = "ProductCreator";
+const serviceName = "ProductCreator-front";
 
 const initializeTracer = async () => {
     const provider = new WebTracerProvider({
@@ -20,7 +20,7 @@ const initializeTracer = async () => {
     provider.addSpanProcessor(
         new BatchSpanProcessor(
             new OTLPTraceExporter({
-                url: 'http://localhost:4320/v1/traces',
+                url: 'http://localhost:4318/v1/traces',
                 headers: {},
             })
         )

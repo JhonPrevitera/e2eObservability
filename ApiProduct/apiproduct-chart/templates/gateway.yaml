@@ -1,0 +1,16 @@
+# templates/gateway.yaml
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: {{ .Release.Name }}-gateway
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    istio: ingressgateway  # Selector padrão do Istio
+  servers:
+    - port:
+        number: 8080
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
