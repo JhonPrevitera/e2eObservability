@@ -10,22 +10,16 @@ services:
       - ./otel-dotnet.env
     environment:
       OTEL_SERVICE_NAME: "apiproduct"
-      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otelcollector:4318"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://host.docker.internal:4320"
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://host.docker.internal:4320/v1/traces"
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: "http://host.docker.internal:4320/v1/metrics"
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: "http://host.docker.internal:4320/v1/logs"
       ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=ayla;User Id=sa;Password=123testPass@;TrustServerCertificate=True;"
     ports:
       - "8080:8080"
       - "8081:8081"
 
   
-  otelcollector:
-    image: otel/opentelemetry-collector-contrib
-    container_name: otelcollector
-    volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    command: ["--config=/etc/otel-collector-config.yaml"]
-    ports:
-      - "4318:4318"
-      - "4317:4317"
 
   
   sqlserver:

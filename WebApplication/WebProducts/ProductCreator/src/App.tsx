@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
-import  TraceProvider  from "./tracing.tsx";
+import TraceProvider from "./tracing.tsx";
+import { init as initApm } from '@elastic/apm-rum';
 
+// Configuração do Elastic RUM
+const apm = initApm({
+    serviceName: 'ProductCreator',
+
+    serverUrl: '/apm', // Usa o proxy configurado no Vite
+    serviceVersion: '1.0.0',
+
+    environment: 'development' // Ambiente (ex: "production", "development")
+});
 interface Product {
     name: string;
     sku: string;
@@ -37,13 +47,21 @@ const ProductCreator: React.FC = () => {
     };
 
     const createProduct = async () => {
+        // Inicia uma transação para o processo de criação de produto
+        const transaction = apm.startTransaction("Create Product", "product-creation");
+
         try {
             const response = await axios.post(
-                "http://localhost:8080/api/ControllerProduct/produto",
+                "http://localhost:9090/api/ControllerProduct/produto",
                 product
             );
             setMessage("Product created successfully!");
             console.log("Response:", response.data);
+
+            // Finaliza a transação com sucesso
+            if (transaction) {
+                transaction.end();
+            }
 
             // Ativa a animação
             setIsSubmitted(true);
@@ -65,6 +83,11 @@ const ProductCreator: React.FC = () => {
         } catch (error) {
             console.error("Error creating product:", error);
             setMessage("Failed to create product.");
+
+            // Captura o erro e finaliza a transação com falha
+            if (transaction) {
+                transaction.end();
+            }
         }
     };
 
