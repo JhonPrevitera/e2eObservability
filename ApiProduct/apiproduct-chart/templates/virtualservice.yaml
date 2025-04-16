@@ -15,6 +15,6 @@ spec:
             prefix: /
       route:
         - destination:
-            host: {{ .Release.Name }}-svc
+            host: apiproduct.desenvolvimento.svc.cluster.local
             port:
               number: 8080
